@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏊 수영일기</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🏊‍♂️ 수영일기</h1>
+
+    <form id="swim-form">
+      <div class="form-group">
+        <label for="date">날짜</label>
+        <input type="date" id="date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="pool">수영장</label>
+        <input type="text" id="pool" placeholder="수영장 이름" autocomplete="off">
+        <div id="favorites" class="favorites"></div>
+      </div>
+
+      <div class="form-group row">
+        <div>
+          <label for="distance">거리 (m)</label>
+          <input type="number" id="distance" placeholder="1000" min="0">
+        </div>
+        <div>
+          <label for="duration">시간 (분)</label>
+          <input type="number" id="duration" placeholder="60" min="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>영법</label>
+        <div class="strokes">
+          <label><input type="checkbox" value="자유형"> 자유형</label>
+          <label><input type="checkbox" value="배영"> 배영</label>
+          <label><input type="checkbox" value="평영"> 평영</label>
+          <label><input type="checkbox" value="접영"> 접영</label>
+          <label><input type="checkbox" value="킥판"> 킥판</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="diary">오늘의 한 줄</label>
+        <textarea id="diary" placeholder="오늘의 감상이나 팁을 남겨보세요" rows="2"></textarea>
+      </div>
+
+      <button type="submit">저장하기</button>
+    </form>
+
+    <section id="records"></section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
