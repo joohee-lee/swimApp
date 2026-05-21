@@ -5,6 +5,10 @@ const form = document.getElementById('swim-form');
 const recordsEl = document.getElementById('records');
 const poolInput = document.getElementById('pool');
 const favoritesEl = document.getElementById('favorites');
+const submitBtn = document.getElementById('submit-btn');
+const cancelBtn = document.getElementById('cancel-btn');
+
+let editingIndex = null;
 
 // 오늘 날짜 기본값
 document.getElementById('date').valueAsDate = new Date();
@@ -51,6 +55,38 @@ function resetStrokes() {
   document.querySelectorAll('.strokes input').forEach(el => el.checked = false);
 }
 
+function enterEditMode(index) {
+  const records = load();
+  const r = records[index];
+  editingIndex = index;
+
+  document.getElementById('date').value = r.date;
+  poolInput.value = r.pool || '';
+  document.getElementById('distance').value = r.distance || '';
+  document.getElementById('duration').value = r.duration || '';
+  resetStrokes();
+  r.strokes.forEach(s => {
+    const el = document.querySelector(`.strokes input[value="${s}"]`);
+    if (el) el.checked = true;
+  });
+  document.getElementById('diary').value = r.diary || '';
+
+  submitBtn.textContent = '수정하기';
+  cancelBtn.classList.remove('hidden');
+  form.scrollIntoView({ behavior: 'smooth' });
+}
+
+function exitEditMode() {
+  editingIndex = null;
+  submitBtn.textContent = '저장하기';
+  cancelBtn.classList.add('hidden');
+  resetStrokes();
+  form.reset();
+  document.getElementById('date').valueAsDate = new Date();
+}
+
+cancelBtn.addEventListener('click', exitEditMode);
+
 function renderCards() {
   const records = load();
   if (!records.length) {
@@ -59,7 +95,10 @@ function renderCards() {
   }
   recordsEl.innerHTML = records.map((r, i) => `
     <div class="card">
-      <button class="delete-btn" data-index="${i}">✕</button>
+      <div class="card-actions">
+        <button class="edit-btn" data-index="${i}">✎</button>
+        <button class="delete-btn" data-index="${i}">✕</button>
+      </div>
       <div class="card-header">
         <span class="card-date">${r.date}</span>
         <span class="card-pool">${r.pool || '—'}</span>
@@ -79,7 +118,11 @@ recordsEl.addEventListener('click', e => {
     const records = load();
     records.splice(Number(e.target.dataset.index), 1);
     save(records);
+    if (editingIndex !== null) exitEditMode();
     renderCards();
+  }
+  if (e.target.classList.contains('edit-btn')) {
+    enterEditMode(Number(e.target.dataset.index));
   }
 });
 
@@ -94,12 +137,19 @@ form.addEventListener('submit', e => {
     diary: document.getElementById('diary').value.trim(),
   };
   const records = load();
-  records.unshift(record);
-  save(records);
-  saveFavorite(record.pool);
-  resetStrokes();
-  form.reset();
-  document.getElementById('date').valueAsDate = new Date();
+  if (editingIndex !== null) {
+    records[editingIndex] = record;
+    save(records);
+    saveFavorite(record.pool);
+    exitEditMode();
+  } else {
+    records.unshift(record);
+    save(records);
+    saveFavorite(record.pool);
+    resetStrokes();
+    form.reset();
+    document.getElementById('date').valueAsDate = new Date();
+  }
   renderCards();
 });
 
